@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+  backend:
+    build:
+      context: ../
+      dockerfile: ./docker/python-backend.Dockerfile
+    env_file:
+      - ../backend/.env
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/gcp-service-account.json
+    volumes:
+      - ../backend:/app/backend
+      - ../backend/credentials:/app/credentials:ro
+    ports:
+      - "1221:1221"
+    command: ["uvicorn", "backend.app:app", "--host", "0.0.0.0", "--port", "1221"]
+
+  agent-ui:
+    build:
+      context: ../agent-ui
+      dockerfile: ./Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
